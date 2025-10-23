@@ -60,7 +60,7 @@ export abstract class Component {
   /**
    * Convert component to string representation
    */
-  public toString(): string {
+  public toString(): string | undefined {
     return `${this.getType()} [ID: ${this.id}, Entity: ${this.entityId}, Enabled: ${this.enabled}]`;
   }
 }

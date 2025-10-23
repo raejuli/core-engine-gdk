@@ -4,5 +4,5 @@
  * Main engine implementation and core types.
  */
 
-export * from './Engine';
+export * from './WorldEngine';
 export * from './types';

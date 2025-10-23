@@ -5,3 +5,4 @@
  */
 
 export * from './ServiceLocator';
+export * from './ResourceManager';
