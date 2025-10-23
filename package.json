@@ -1,0 +1,60 @@
+{
+  "name": "@raejuli/core-engine-gdk",
+  "version": "0.1.0",
+  "description": "A game development kit (GDK) core engine built with TypeScript and Pixi.js.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./ecs": {
+      "import": "./dist/ecs/index.js",
+      "types": "./dist/ecs/index.d.ts"
+    },
+    "./events": {
+      "import": "./dist/events/index.js",
+      "types": "./dist/events/index.d.ts"
+    },
+    "./input": {
+      "import": "./dist/input/index.js",
+      "types": "./dist/input/index.d.ts"
+    },
+    "./state": {
+      "import": "./dist/state/index.js",
+      "types": "./dist/state/index.d.ts"
+    },
+    "./services": {
+      "import": "./dist/services/index.js",
+      "types": "./dist/services/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/core/index.js",
+      "types": "./dist/core/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "game-engine",
+    "ecs",
+    "entity-component-system",
+    "typescript",
+    "pixi.js"
+  ],
+  "author": "raejuli",
+  "license": "MIT",
+  "peerDependencies": {
+    "pixi.js": "^8.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "pixi.js": "^8.0.0"
+  }
+}
