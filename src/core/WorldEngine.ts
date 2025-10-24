@@ -113,7 +113,10 @@ export class WorldEngine {
 
     this.running = true;
     this.lastTime = performance.now();
-    this.input.listen(window);
+    
+    // Listen for input on the canvas (for both keyboard and mouse)
+    this.input.listen(this.app.canvas as HTMLCanvasElement);
+    
     this.loop(this.lastTime);
 
     // Emit started event
@@ -134,7 +137,7 @@ export class WorldEngine {
 
     this.running = false;
     cancelAnimationFrame(this.frameHandle);
-    this.input.stopListening(window);
+    this.input.stopListening(this.app.canvas as HTMLCanvasElement);
 
     // Emit stopped event
     this.events.emit('engine:stopped', {});

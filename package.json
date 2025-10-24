@@ -31,9 +31,21 @@
       "import": "./dist/services/index.js",
       "types": "./dist/services/index.d.ts"
     },
+    "./systems": {
+      "import": "./dist/systems/index.js",
+      "types": "./dist/systems/index.d.ts"
+    },
     "./core": {
       "import": "./dist/core/index.js",
       "types": "./dist/core/index.d.ts"
+    },
+    "./components": {
+      "import": "./dist/components/index.js",
+      "types": "./dist/components/index.d.ts"
+    },
+    "./serialization": {
+      "import": "./dist/serialization/index.js",
+      "types": "./dist/serialization/index.d.ts"
     }
   },
   "scripts": {

@@ -50,19 +50,19 @@ export class Entity {
   public addComponent<T extends Component>(component: T): T {
     const type = component.getType();
     component.entityId = this.id;
-    
+
     // Set world reference on component if we have one
     if (this._world) {
       component.setWorld(this._world);
     }
-    
+
     this._components.set(component.id.toString(), component);
-    
+
     if (!this._componentsByType.has(type)) {
       this._componentsByType.set(type, []);
     }
     this._componentsByType.get(type)!.push(component);
-    
+
     return component;
   }
 
@@ -94,7 +94,7 @@ export class Entity {
   public removeComponent(component: Component): void {
     const type = component.getType();
     this._components.delete(component.id.toString());
-    
+
     const typeComponents = this._componentsByType.get(type);
     if (typeComponents) {
       const index = typeComponents.indexOf(component);
@@ -130,6 +130,13 @@ export class Entity {
    * Destroy entity - cleanup all components
    */
   public destroy(): void {
+    // Destroy all components first
+    for (const component of this._components.values()) {
+      component.destroy();
+    }
+
+    this._world!.removeEntity(this);
+
     this._components.clear();
     this._componentsByType.clear();
     this.active = false;

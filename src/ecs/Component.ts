@@ -58,6 +58,15 @@ export abstract class Component {
   }
 
   /**
+   * Cleanup resources when component is destroyed
+   * Override this in subclasses to implement custom cleanup logic
+   */
+  public destroy(): void {
+    // Base implementation does nothing
+    // Subclasses can override to cleanup resources
+  }
+
+  /**
    * Convert component to string representation
    */
   public toString(): string | undefined {

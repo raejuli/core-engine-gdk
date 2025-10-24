@@ -117,7 +117,7 @@ export class World {
   /**
    * Get a system by type
    */
-  public getSystem<T extends System>(systemType: new (world: World) => T): T | undefined {
+  public getSystem<T extends System>(systemType: new (world: World, ...rest: any[]) => T): T | undefined {
     return this._systems.find(s => s instanceof systemType) as T | undefined;
   }
 

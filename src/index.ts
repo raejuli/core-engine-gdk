@@ -4,7 +4,6 @@
  * A flexible, TypeScript-based game engine with ECS architecture.
  * Designed to be shared between multiple game projects.
  * 
- * @module @shared/engine
  */
 
 // Core engine
@@ -24,3 +23,12 @@ export * from './state';
 
 // Services
 export * from './services';
+
+// Systems
+export * from './systems';
+
+// Components
+export * from './components';
+
+// Serialization
+export * from './serialization';
