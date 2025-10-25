@@ -5,7 +5,7 @@
  * Provides game loop management, PixiJS integration, and lifecycle events.
  */
 
-import { Application } from 'pixi.js';
+import { Application, Container } from 'pixi.js';
 import { World } from '../ecs/World';
 import { EventBus } from '../events/EventBus';
 import { InputManager } from '../input/InputManager';
@@ -17,6 +17,10 @@ export interface WorldEngineOptions {
   backgroundColor?: number | string;
   antialias?: boolean;
   debug?: boolean;
+  safeWidth?: number;
+  safeHeight?: number;
+  maxWidth?: number;
+  maxHeight?: number;
 }
 
 /**
@@ -52,6 +56,15 @@ export class WorldEngine {
   public readonly input: InputManager;
   public readonly resources: ResourceManager;
   
+  public root!: Container; // View container for scaling/centering
+  public stage!: Container; // The actual game stage
+  
+  private canvasElement!: HTMLCanvasElement;
+  private safeWidth: number = 1280;
+  private safeHeight: number = 960;
+  private maxWidth: number = 1920;
+  private maxHeight: number = 1080;
+  
   private running = false;
   private lastTime = 0;
   private frameHandle = 0;
@@ -74,15 +87,21 @@ export class WorldEngine {
    * Initialize the engine with a container element
    */
   public async initialize(container: HTMLElement, options?: WorldEngineOptions): Promise<void> {
-    const width = options?.width ?? 800;
-    const height = options?.height ?? 600;
+    const width = options?.width ?? this.safeWidth;
+    const height = options?.height ?? this.safeHeight;
     const backgroundColor = options?.backgroundColor ?? 0x1a1a2e;
     const antialias = options?.antialias ?? false;
+    
+    // Set safe area and max dimensions from options
+    this.safeWidth = options?.safeWidth ?? width;
+    this.safeHeight = options?.safeHeight ?? height;
+    this.maxWidth = options?.maxWidth ?? this.safeWidth * 1.5;
+    this.maxHeight = options?.maxHeight ?? this.safeHeight * 1.125;
 
-    // Initialize PixiJS application
+    // Initialize PixiJS application with max dimensions
     await this.app.init({
-      width,
-      height,
+      width: this.maxWidth,
+      height: this.maxHeight,
       backgroundColor,
       antialias,
       resolution: window.devicePixelRatio || 1,
@@ -91,15 +110,70 @@ export class WorldEngine {
     // Enable sorting by z-index
     this.app.stage.sortableChildren = true;
 
+    // Create a container for scaling/centering
+    const viewContainer = new Container();
+    this.app.stage.addChild(viewContainer);
+    this.root = viewContainer;
+
+    // Create the actual game stage and add to container
+    const gameStage = new Container();
+    viewContainer.addChild(gameStage);
+    this.stage = gameStage;
+    
+    // Store canvas element
+    this.canvasElement = this.app.canvas as HTMLCanvasElement;
+
     // Append canvas to container
-    container.appendChild(this.app.canvas);
+    container.appendChild(this.canvasElement);
 
     // Store app as a resource
     this.resources.set('pixiApp', this.app);
-    this.resources.set('pixiStage', this.app.stage);
+    this.resources.set('pixiStage', this.stage);
+    this.resources.set('pixiRoot', this.root);
+
+    // Set up resize handling
+    window.addEventListener('resize', () => this.handleResize());
+    this.handleResize();
 
     if (this.debug) {
-      console.log(`🎮 WorldEngine initialized: ${width}x${height}`);
+      console.log(`🎮 WorldEngine initialized: Safe=${this.safeWidth}x${this.safeHeight}, Max=${this.maxWidth}x${this.maxHeight}`);
+    }
+  }
+
+  /**
+   * Handle window resize - scales and centers the game
+   */
+  private handleResize(): void {
+    if (!this.canvasElement.parentElement) return;
+    
+    const parent = this.canvasElement.parentElement;
+    const containerWidth = parent.clientWidth;
+    const containerHeight = parent.clientHeight;
+    
+    if (containerWidth <= 0 || containerHeight <= 0) return;
+    
+    this.app.renderer.resize(containerWidth, containerHeight);
+
+    // Calculate scale to fit safe area
+    const scaleX = containerWidth / this.safeWidth;
+    const scaleY = containerHeight / this.safeHeight;
+    const scale = Math.min(scaleX, scaleY, 1);
+
+    // Calculate visible area (overdraw)
+    const visibleWidth = Math.min(containerWidth / scale, this.maxWidth);
+    const visibleHeight = Math.min(containerHeight / scale, this.maxHeight);
+
+    // Center the root container in the viewport
+    this.root.scale.set(scale, scale);
+    this.root.x = (containerWidth - visibleWidth * scale) / 2;
+    this.root.y = (containerHeight - visibleHeight * scale) / 2;
+
+    // Center the stage (safe area) within the visible area
+    this.stage.x = (visibleWidth - this.safeWidth) / 2;
+    this.stage.y = (visibleHeight - this.safeHeight) / 2;
+
+    if (this.debug) {
+      console.log(`🔄 Resize: ${containerWidth}x${containerHeight}, scale=${scale.toFixed(2)}`);
     }
   }
 
@@ -176,7 +250,7 @@ export class WorldEngine {
     // Emit pre-render event
     this.events.emit('engine:preRender', updateEvent);
 
-    // Render
+    // Render (renders app.stage which contains root and stage)
     this.app.renderer.render(this.app.stage);
 
     // Emit post-render event
