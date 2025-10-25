@@ -7,4 +7,5 @@ node_modules/
 .idea/
 .git/
 .gitignore
+.npmrc
 package-lock.json
