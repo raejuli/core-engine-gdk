@@ -1,6 +1,6 @@
 {
   "name": "@raejuli/core-engine-gdk",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A game development kit (GDK) core engine built with TypeScript and Pixi.js.",
   "type": "module",
   "main": "./dist/index.js",

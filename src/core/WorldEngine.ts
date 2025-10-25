@@ -172,6 +172,12 @@ export class WorldEngine {
     this.stage.x = (visibleWidth - this.safeWidth) / 2;
     this.stage.y = (visibleHeight - this.safeHeight) / 2;
 
+    // Update input manager with coordinate transformation
+    // Input needs to account for: root offset + stage offset + scale
+    const totalOffsetX = this.root.x + this.stage.x * scale;
+    const totalOffsetY = this.root.y + this.stage.y * scale;
+    this.input.setCoordinateTransform(scale, totalOffsetX, totalOffsetY);
+
     if (this.debug) {
       console.log(`🔄 Resize: ${containerWidth}x${containerHeight}, scale=${scale.toFixed(2)}`);
     }

@@ -60,6 +60,12 @@ export class InputManager implements InputManagerLike {
   
   private listening = false;
   private canvas: HTMLCanvasElement | null = null;
+  
+  // Scaling properties for coordinate transformation
+  private scaleX: number = 1;
+  private scaleY: number = 1;
+  private offsetX: number = 0;
+  private offsetY: number = 0;
 
   /**
    * Start listening for input events
@@ -238,6 +244,17 @@ export class InputManager implements InputManagerLike {
   }
 
   /**
+   * Set coordinate transformation for scaled/offset canvas
+   * Call this when the canvas scale or position changes
+   */
+  setCoordinateTransform(scale: number, offsetX: number, offsetY: number): void {
+    this.scaleX = scale;
+    this.scaleY = scale;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+  }
+
+  /**
    * Handle keydown events
    */
   private handleKeyDown = (event: KeyboardEvent) => {
@@ -266,8 +283,16 @@ export class InputManager implements InputManagerLike {
     if (!this.canvas) return;
     
     const rect = this.canvas.getBoundingClientRect();
-    this.mouseX = event.clientX - rect.left;
-    this.mouseY = event.clientY - rect.top;
+    // Get mouse position relative to canvas
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+    
+    // Apply inverse transformation to account for scaling and offset
+    x = (x - this.offsetX) / this.scaleX;
+    y = (y - this.offsetY) / this.scaleY;
+    
+    this.mouseX = x;
+    this.mouseY = y;
   };
 
   /**
