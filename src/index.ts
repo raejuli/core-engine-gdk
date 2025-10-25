@@ -6,6 +6,9 @@
  * 
  */
 
+// Components
+export * from './components';
+
 // Core engine
 export * from './core';
 
@@ -18,17 +21,14 @@ export * from './events';
 // Input
 export * from './input';
 
-// State management
-export * from './state';
+// Serialization
+export * from './serialization';
 
 // Services
 export * from './services';
 
+// State management
+export * from './state';
+
 // Systems
 export * from './systems';
-
-// Components
-export * from './components';
-
-// Serialization
-export * from './serialization';

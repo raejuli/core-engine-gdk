@@ -2,4 +2,4 @@
  * Systems exports
  */
 
-export { StateMachineSystem } from './StateMachineSystem';
+export * from './StateMachineSystem';

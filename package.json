@@ -1,6 +1,6 @@
 {
   "name": "@raejuli/core-engine-gdk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A game development kit (GDK) core engine built with TypeScript and Pixi.js.",
   "type": "module",
   "main": "./dist/index.js",
@@ -51,8 +51,14 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build"
   },
+  "files": [
+    "dist",
+    "src",
+    "package.json"
+  ],
   "keywords": [
     "game-engine",
     "ecs",

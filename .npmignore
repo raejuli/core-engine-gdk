@@ -1,0 +1,10 @@
+# Ignore development files
+tsconfig.json
+node_modules/
+*.log
+.DS_Store
+.vscode/
+.idea/
+.git/
+.gitignore
+package-lock.json
