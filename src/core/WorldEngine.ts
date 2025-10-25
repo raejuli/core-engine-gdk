@@ -64,6 +64,9 @@ export class WorldEngine {
   private safeHeight: number = 960;
   private maxWidth: number = 1920;
   private maxHeight: number = 1080;
+  private resizeObserver?: ResizeObserver;
+  private parentElement: HTMLElement | null = null;
+  private readonly handleResizeListener = () => this.handleResize();
   
   private running = false;
   private lastTime = 0;
@@ -125,6 +128,12 @@ export class WorldEngine {
 
     // Append canvas to container
     container.appendChild(this.canvasElement);
+    this.parentElement = this.canvasElement.parentElement;
+
+    if (typeof ResizeObserver !== 'undefined' && this.parentElement) {
+      this.resizeObserver = new ResizeObserver(() => this.handleResize());
+      this.resizeObserver.observe(this.parentElement);
+    }
 
     // Store app as a resource
     this.resources.set('pixiApp', this.app);
@@ -132,7 +141,8 @@ export class WorldEngine {
     this.resources.set('pixiRoot', this.root);
 
     // Set up resize handling
-    window.addEventListener('resize', () => this.handleResize());
+    window.addEventListener('resize', this.handleResizeListener);
+    window.addEventListener('orientationchange', this.handleResizeListener);
     this.handleResize();
 
     if (this.debug) {
@@ -282,6 +292,11 @@ export class WorldEngine {
    */
   public destroy(): void {
     this.stop();
+    window.removeEventListener('resize', this.handleResizeListener);
+    window.removeEventListener('orientationchange', this.handleResizeListener);
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+    this.parentElement = null;
     this.world.destroy();
     this.app.destroy(true, { children: true, texture: true });
     this.events.clear();
