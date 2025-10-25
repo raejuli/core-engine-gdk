@@ -20,6 +20,8 @@ export class Entity {
   private _components: Map<string, Component> = new Map();
   private _componentsByType: Map<string, Component[]> = new Map();
   private _world: World | null = null;
+  private _isDestroying: boolean = false;
+  private _isDestroyed: boolean = false;
 
   constructor(name: string = 'Entity') {
     this.id = nextEntityId++;
@@ -130,17 +132,42 @@ export class Entity {
    * Destroy entity - cleanup all components
    */
   public destroy(): void {
-    // Destroy all components first
+    if (this._isDestroying || this._isDestroyed) {
+      return;
+    }
+
+    this._isDestroying = true;
+
+    const world = this._world;
+
+    this.finalizeDestroy();
+
+    if (world) {
+      world.removeEntity(this);
+    }
+  }
+
+  /**
+   * Finalize the destruction of this entity.
+   * Called internally by the World once the entity has been removed from
+   * its registries, or directly if the entity is not attached to a world.
+   */
+  public finalizeDestroy(): void {
+    if (this._isDestroyed) {
+      this._isDestroying = false;
+      return;
+    }
+
     for (const component of this._components.values()) {
       component.destroy();
     }
-
-    this._world!.removeEntity(this);
 
     this._components.clear();
     this._componentsByType.clear();
     this.active = false;
     this._world = null;
+    this._isDestroyed = true;
+    this._isDestroying = false;
   }
 
   /**

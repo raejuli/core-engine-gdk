@@ -168,7 +168,7 @@ export class World {
    * Actually remove an entity from the world
    */
   private _performEntityRemoval(entity: Entity): void {
-    entity.destroy();
+    entity.finalizeDestroy();
     this._entities.delete(entity.id);
   }
 
@@ -184,7 +184,7 @@ export class World {
 
     // Destroy all entities
     for (const entity of this._entities.values()) {
-      entity.destroy();
+      entity.finalizeDestroy();
     }
     this._entities.clear();
     this._entitiesToAdd = [];
